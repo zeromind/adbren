@@ -21,7 +21,7 @@ use File::Copy;
 use File::Path;
 use File::Find;
 use File::HomeDir;
-use File::Pid;
+#use File::Pid;
 use Getopt::Long;
 use Storable qw(nstore retrieve);
 use Data::Dumper;
@@ -160,10 +160,10 @@ if ($onlyhash) {
 
 $SIG{'INT'} = 'CLEANUP';
 
-my $pidfile = File::Pid->new;
-my $pid = $pidfile->running;
-die "Client already running: $pid\n" if $pid;
-$pidfile->write;
+# my $pidfile = File::Pid->new;
+# my $pid = $pidfile->running;
+# die "Client already running: $pid\n" if $pid;
+# $pidfile->write;
 
 sub CLEANUP {
     exit(1);
@@ -894,9 +894,9 @@ sub ed2k_hash {
 }
 
 END {
-    if ( defined $pidfile and defined $pidfile->running and $pidfile->running eq $$ ) {
-        $pidfile->remove or warn "Could not unlink pid file\n";
-    }
+    # if ( defined $pidfile and defined $pidfile->running and $pidfile->running eq $$ ) {
+    #     $pidfile->remove or warn "Could not unlink pid file\n";
+    # }
     if ( defined $a ) {
         $a->logout();
     }
