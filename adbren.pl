@@ -172,23 +172,22 @@ sub CLEANUP {
 my $fileinfo;
 my $newname;
 
-foreach my $filepath (@files) {
+FILEPATH: foreach my $filepath (@files) {
     if ( not -e $filepath ) {
         print "$filepath Not found\n";
         next;
     }
     my $retry;
     my ( $volume, $directory, $filename ) = File::Spec->splitpath($filepath);
-    print "File: $volume $directory, $filename" if $debug;
+    print "File: $volume $directory, $filename\n" if $debug;
     if ( not $noskip and -f $logfile ) {
         open my $log, "<", $logfile;
-        $/ = 1;
-        my @raw_data = <$log>;
-        my $filename_qm = quotemeta $filename;
-        my @matches = grep { /$filename_qm/ } @raw_data;
-        if ( scalar @matches > 0 ) {
-            print "Skipped: $filename\n";
-            next;
+        while(my $line = <$log>){
+            chomp $line;
+            if ($line eq $filepath) {
+                print "Skipped: $filepath\n";
+                next FILEPATH;
+            }
         }
     }
   RETRY:;
@@ -261,6 +260,11 @@ foreach my $filepath (@files) {
     }
     print $filepath. ": Renamed to " . $newpath . "\n";
     if ($norename) {
+            if ( not $nolog ) {
+                open( my $log, ">>", $logfile ) or die $!;
+                print $log "$filepath\n";
+                close $log;
+            }
     }
     else {
 
